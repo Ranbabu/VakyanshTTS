@@ -9,9 +9,9 @@ RUN git clone https://github.com/Open-Speech-EkStep/vakyansh-tts.git /app/vakyan
 
 WORKDIR /app/vakyansh
 
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt fastapi uvicorn
 
 EXPOSE 5000
 
-# FastAPI app को uvicorn से run करें
-CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "5000"]
+# हमारी FastAPI app.py को run करें
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000"]
