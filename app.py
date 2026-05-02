@@ -1,9 +1,11 @@
 from flask import Flask, request, send_file
+from flask_cors import CORS  # <-- यह नया ऐड किया गया है
 import subprocess
 import uuid
 import os
 
 app = Flask(__name__)
+CORS(app)  # <-- यह आपके localhost या किसी भी वेबसाइट को एक्सेस की परमिशन देगा
 
 @app.route("/", methods=["GET"])
 def root():
