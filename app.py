@@ -1,30 +1,29 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse
+from flask import Flask, request, send_file
 import subprocess
 import uuid
 import os
 
-app = FastAPI()
+app = Flask(__name__)
 
-@app.get("/")
-async def root():
-    return {"message": "Vakyansh TTS API is running!"}
+@app.route("/", methods=["GET"])
+def root():
+    return {"message": "Vakyansh TTS API is running successfully!"}
 
-@app.post("/tts")
-async def tts(request: Request):
+@app.route("/tts", methods=["POST"])
+def tts():
     try:
-        data = await request.json()
+        # Request se data nikalna
+        data = request.get_json(force=True)
         text = data.get("input", "")
         lang = data.get("lang", "hi")
 
         if not text:
-            return {"error": "No input text provided"}
+            return {"error": "No input text provided"}, 400
 
-        # Output file ka ek unique naam banayein
+        # Output audio ke liye ek unique naam
         output_file = f"output_{uuid.uuid4().hex}.wav"
 
-        # Vakyansh inference script ko call karein
-        # Note: Ensure karein ki tts_infer.py vakyansh folder ke andar maujood hai
+        # Vakyansh TTS engine ko call karna
         subprocess.run([
             "python", "tts_infer.py",
             "--lang", lang,
@@ -32,11 +31,17 @@ async def tts(request: Request):
             "--output", output_file
         ], check=True)
 
-        # File check karein aur wapas bhejein
+        # Agar audio ban gayi hai toh return karna
         if os.path.exists(output_file):
-            return FileResponse(output_file, media_type="audio/wav")
+            return send_file(output_file, mimetype="audio/wav")
         else:
-            return {"error": "TTS engine failed to generate audio file."}
+            return {"error": "TTS engine failed to generate audio file."}, 500
 
+    except subprocess.CalledProcessError as e:
+        return {"error": f"TTS script failed: {str(e)}"}, 500
     except Exception as e:
-        return {"error": str(e)}
+        return {"error": str(e)}, 500
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
+
