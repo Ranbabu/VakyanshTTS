@@ -20,10 +20,10 @@ def tts():
         if not text:
             return {"error": "No input text provided"}, 400
 
-        # Output audio ke liye ek unique naam
+        # Output audio ke liye ek unique naam banayein
         output_file = f"output_{uuid.uuid4().hex}.wav"
 
-        # Vakyansh TTS engine ko call karna
+        # Vakyansh TTS engine ko call karein
         subprocess.run([
             "python", "tts_infer.py",
             "--lang", lang,
@@ -31,7 +31,7 @@ def tts():
             "--output", output_file
         ], check=True)
 
-        # Agar audio ban gayi hai toh return karna
+        # Agar audio ban gayi hai toh return karein
         if os.path.exists(output_file):
             return send_file(output_file, mimetype="audio/wav")
         else:
@@ -44,4 +44,3 @@ def tts():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
-
